@@ -1,5 +1,7 @@
 #include <unistd.h>
 #include <type.h>
+#include <algorithm>
+
 
 void clear_shape(Shape* block, Board &board)
 {
@@ -96,7 +98,50 @@ bool can_move_sideways(Shape* block, Board &board, int type){
     }
     return true;
 }
+void rotate(Shape* block, Board &board) {
+    std::vector<std::vector<bool>> original_matrix = block->matrice;
+    
+    clear_shape(block, board);
+    std::vector<std::vector<bool>> rotated_matrix(4, std::vector<bool>(4, false));
+    
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            rotated_matrix[j][3-i] = block->matrice[i][j];
+        }
+    }
+    
+    block->matrice = rotated_matrix;
+   
+    draw_shape(block, board);
+}
 
+bool can_rotate(Shape* block, Board &board) {
+    for (int y = 0; y < 4; y++) {
+        for (int x = 0; x < 4; x++) {
+            if (block->matrice[y][x] == 1) {
+                int boardY = block->pos.y + y;
+                int boardX = block->pos.x + x;
+                
+                if (boardY < 0 || boardY >= HEIGHT || 
+                    boardX < 0 || boardX >= WIDTH) {
+                    return false;
+                }
+                
+                if (board.grid[boardY][boardX].type == 7) {
+                    return false;
+                }
+                
+                if (board.grid[boardY][boardX].type == 1 || 
+                    board.grid[boardY][boardX].type == 2 || 
+                    board.grid[boardY][boardX].type == 3 || 
+                    board.grid[boardY][boardX].type == 4) {
+                    return false;
+                }
+            }
+        }
+    }
+    return true;
+}
 
 bool collision_check(Shape* block, Board &board)
 {    
@@ -149,6 +194,12 @@ void drop(Shape* block, Board &board)
                 case KEY_RIGHT:
                     if (can_move_sideways(block, board, 1)) {
                         move_right(block, board);
+                    }
+                    break;
+                case 'w':
+                case KEY_UP:
+                    if (can_rotate(block, board)) {
+                        rotate(block, board);
                     }
                     break;
                 case 's':
