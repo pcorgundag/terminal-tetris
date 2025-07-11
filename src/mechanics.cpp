@@ -116,9 +116,18 @@ void rotate(Shape* block, Board &board) {
 }
 
 bool can_rotate(Shape* block, Board &board) {
+
+std::vector<std::vector<bool>> rotated_matrix(4, std::vector<bool>(4, false));
+    
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            rotated_matrix[j][3-i] = block->matrice[i][j];
+        }
+    }
+
     for (int y = 0; y < 4; y++) {
         for (int x = 0; x < 4; x++) {
-            if (block->matrice[y][x] == 1) {
+            if (rotated_matrix[y][x] == 1) {
                 int boardY = block->pos.y + y;
                 int boardX = block->pos.x + x;
                 
@@ -175,6 +184,23 @@ void freeze(Shape* block, Board &board)
     }
 }
 
+void insta(Shape* block, Board &board)
+{   
+    int prevpos = block->pos.y;
+    int newpos = 0;
+    block->pos.y = 20;
+    while(!collision_check(block, board)){
+        block->pos.y--;
+        newpos = block->pos.y;
+    }
+    
+    block->pos.y = prevpos;
+    clear_shape(block, board);
+    block->pos.y = newpos;
+    draw_shape(block, board);
+}
+
+
 void drop(Shape* block, Board &board)
 {
     int drop_counter = 0;
@@ -207,6 +233,9 @@ void drop(Shape* block, Board &board)
                     move_down(block, board);
                     drop_counter = 0;  // Reset counter on manual drop
                     break;
+                case ' ':
+                    insta(block, board);
+                    break;
                 case 'q':
                     endwin();
                     exit(0);
@@ -223,6 +252,7 @@ void drop(Shape* block, Board &board)
         
         clear();
         board.printBoard();
+        block->print_block_cell();
         usleep(20000);  // Much faster frame rate (20ms)
     }
     freeze(block, board);

@@ -84,14 +84,19 @@ void game_loop()
 
     Board board;
     bool finish = false;
+    int num = -1;
    while(!finish){
-        Shape* block = new Shape;
+        Shape* block = new Shape(num);
+        int next = rand() % 7;
+        block->next = next;
         std::vector<int> tetris = check_completed_lines(board);
         if(tetris.size() > 0){
             break_row(board, tetris);
         }
         drop(block, board);
+        num = next;
     }
-    endwin();
+
+
     
 }

@@ -34,29 +34,35 @@ public:
     Position pos;
     int rotation;
     Color color;
+    int next;
 
-    Shape(){
-        type = rand() % 7;
+    Shape(int num){
+        if(num == -1){
+            type = rand() % 7;
+        }
+        else{
+            type = num;
+        }
         switch (type){
             case 0:
                 color = Color::Yellow;
                 matrice = {
-                {0, 1, 1, 0},
-                {0, 1, 1, 0},
                 {0, 0, 0, 0},
+                {0, 1, 1, 0},
+                {0, 1, 1, 0},
                 {0, 0, 0, 0},
                 };
                 break;
-            case 1:
+            case 3:
                 color = Color::Teal;
                 matrice = {
+                {0, 0, 0, 0},
+                {0, 0, 0, 0},
                 {1, 1, 1, 1},
-                {0, 0, 0, 0},
-                {0, 0, 0, 0},
                 {0, 0, 0, 0},
                 };
                 break;
-            case 2:
+            case 6:
                 color = Color::Red;
                 matrice = {
                 {0, 1, 1, 0},
@@ -65,7 +71,7 @@ public:
                 {0, 0, 0, 0},
                 };
                 break;
-            case 3:
+            case 5:
                 color = Color::Green;
                 matrice = {
                 {1, 1, 0, 0},
@@ -74,7 +80,7 @@ public:
                 {0, 0, 0, 0},
                 };
                 break;
-            case 4:
+            case 1:
                 color = Color::Orange;
                 matrice = {
                 {1, 1, 1, 0},
@@ -83,7 +89,7 @@ public:
                 {0, 0, 0, 0},
                 };
                 break;
-            case 5:
+            case 2:
                 color = Color::Blue;
                 matrice = {
                 {0, 1, 1, 1},
@@ -92,7 +98,7 @@ public:
                 {0, 0, 0, 0},
                 };
                 break;
-            case 6:
+            case 4:
                 color = Color::Purple;
                 matrice = {
                 {0, 1, 0, 0},
@@ -106,7 +112,59 @@ public:
         pos.x = 4;
         pos.y = 0;
     }
-
+    
+    void print_block_cell()
+    {
+    attron(COLOR_PAIR(8));
+    int startY = 5;
+    int startX = 90;
+    
+    // Draw the box
+    mvprintw(startY, startX, "     NEXT     ");
+    mvprintw(startY+1, startX, "|------------|");
+    
+    for(int i = 2; i < 4; i++){
+        mvprintw(startY + i, startX, "|            |");
+    }
+    mvprintw(startY + 4, startX, "|------------|");
+    
+    int shapeColor = static_cast<int>(next) + 1;
+    attron(COLOR_PAIR(shapeColor));
+    
+    switch(next){
+        case 0: // Yellow Square
+            mvprintw(startY + 2, startX + 5, "[][]");
+            mvprintw(startY + 3, startX + 5, "[][]");
+            break;
+        case 3: // Teal Line
+            mvprintw(startY + 2, startX + 3, "[][][][]");
+            break;
+        case 6: // Red Z
+            mvprintw(startY + 2, startX + 6, "[][]");
+            mvprintw(startY + 3, startX + 4, "[][]");
+            break;
+        case 5: // Green S
+            mvprintw(startY + 2, startX + 4, "[][]");
+            mvprintw(startY + 3, startX + 6, "[][]");
+            break;
+        case 1: // Orange L
+            mvprintw(startY + 2, startX + 4, "[][][]");
+            mvprintw(startY + 3, startX + 4, "[]");
+            break;
+        case 2: // Blue J
+            mvprintw(startY + 2, startX + 4, "[][][]");
+            mvprintw(startY + 3, startX + 8, "[]");
+            break;
+        case 4: // Purple T
+            mvprintw(startY + 2, startX + 6, "[]");
+            mvprintw(startY + 3, startX + 4, "[][][]");
+            break;
+    }
+    
+    attroff(COLOR_PAIR(shapeColor));
+    attroff(COLOR_PAIR(8));
+    refresh();
+}
 
 };
 
@@ -211,5 +269,6 @@ private:
         
     }
 };
+
 #endif
 

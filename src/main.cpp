@@ -11,6 +11,8 @@ int main() {
     rand();
 
     game_loop();
+    endwin();
+    system("reset");
 
     return 0;
 }
