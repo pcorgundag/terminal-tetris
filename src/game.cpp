@@ -1,14 +1,16 @@
 #include "mechanics.h"
 #include "type.h"
 
-bool finish(Shape* block, Board &board)
+bool finish(Board &board)
 {
-    for(int i = 0; i < 10; i++ ){
-        if((board.grid[0][i].type == 7) || (board.grid[0][i].type == 6)){
-            return false;
+    for(int y = 0; y < 4; y++){
+        for(int x = 1; x < 11; x++){
+            if(board.grid[y][x].type == 7){
+                return true;
+            }
         }
     }
-        return true;
+        return false;
 }
 void break_row(Board &board, std::vector<int>& completed_lines)
 {   std::vector<int> empty;
@@ -75,10 +77,9 @@ void game_loop()
     keypad(stdscr, TRUE);
 
     Board board;
-    bool finish = false;
     int num = -1;
     Player player;
-   while(true){
+   while(!finish(board)){
         Shape* block = player.create_block();
         std::vector<int> tetris = check_completed_lines(board);
         if(tetris.size() > 0){
