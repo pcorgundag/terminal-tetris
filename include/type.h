@@ -4,10 +4,10 @@
 #include <cstdlib>
 #include <ctime>  
 
-#ifndef HEADERFILE_H
-#define HEADERFILE_H
+#ifndef TYPE_H
+#define TYPE_H
 
-const int HEIGHT = 23;
+const int HEIGHT = 26;
 const int WIDTH = 12;
 
 enum class Color {
@@ -48,9 +48,9 @@ public:
                 color = Color::Yellow;
                 matrice = {
                 {0, 0, 0, 0},
-                {0, 1, 1, 0},
-                {0, 1, 1, 0},
                 {0, 0, 0, 0},
+                {0, 1, 1, 0},
+                {0, 1, 1, 0},
                 };
                 break;
             case 3:
@@ -65,52 +65,52 @@ public:
             case 6:
                 color = Color::Red;
                 matrice = {
+                {0, 0, 0, 0},
+                {0, 0, 0, 0},
                 {0, 1, 1, 0},
                 {1, 1, 0, 0},
-                {0, 0, 0, 0},
-                {0, 0, 0, 0},
                 };
                 break;
             case 5:
                 color = Color::Green;
                 matrice = {
+                {0, 0, 0, 0},
+                {0, 0, 0, 0},
                 {1, 1, 0, 0},
                 {0, 1, 1, 0},
-                {0, 0, 0, 0},
-                {0, 0, 0, 0},
                 };
                 break;
             case 1:
                 color = Color::Orange;
                 matrice = {
+                {0, 0, 0, 0},
+                {0, 0, 0, 0},
                 {1, 1, 1, 0},
                 {1, 0, 0, 0},
-                {0, 0, 0, 0},
-                {0, 0, 0, 0},
                 };
                 break;
             case 2:
                 color = Color::Blue;
                 matrice = {
+                {0, 0, 0, 0},
+                {0, 0, 0, 0},
                 {0, 1, 1, 1},
                 {0, 0, 0, 1},
-                {0, 0, 0, 0},
-                {0, 0, 0, 0},
                 };
                 break;
             case 4:
                 color = Color::Purple;
                 matrice = {
+                {0, 0, 0, 0},
+                {0, 0, 0, 0},
                 {0, 1, 0, 0},
                 {1, 1, 1, 0},
-                {0, 0, 0, 0},
-                {0, 0, 0, 0},
                 };
                 break; 
                 
         }
         pos.x = 4;
-        pos.y = 0;
+        pos.y = -2;
     }
     
     void print_block_cell()
@@ -120,7 +120,7 @@ public:
     int startX = 90;
     
     // Draw the box
-    mvprintw(startY, startX, "     NEXT     ");
+    mvprintw(startY, startX, "NEXT          ");
     mvprintw(startY+1, startX, "|------------|");
     
     for(int i = 2; i < 4; i++){
@@ -190,7 +190,7 @@ public:
         
         attron(COLOR_PAIR(8));
         
-        int startY = 5;
+        int startY = 2;
         int startX = 55;
         
         for(int y = 0; y < HEIGHT; y++){
@@ -242,25 +242,35 @@ private:
         for(int i = 0; i < 12; i++){
             grid[0][i].type = 5;
         }
+        for(int i = 0; i < 12; i++){
+            grid[1][i].type = 5;
+        }
+        for(int i = 0; i < 12; i++){
+            grid[2][i].type = 5;
+        }
+        for(int i = 0; i < 12; i++){
+            grid[3][i].type = 5;
+        }
+
         //vertical walls
-        for(int i = 1; i < 21; i++){
+        for(int i = 4; i < 24; i++){
             grid[i][0].type = 1;
             grid[i][11].type = 2;
         }
         //horizontal walls
         for(int i = 1; i < 11; i++){
-            grid[21][i].type = 3;
+            grid[24][i].type = 3;
         }
         //bottom part
         for(int i = 1; i < 11; i++){
-            grid[22][i].type = 4;
+            grid[25][i].type = 4;
         }
-        grid[21][0].type = 1;
-        grid[21][11].type = 2;
-        grid[22][0].type = 5;
-        grid[22][11].type = 5;
+        grid[24][0].type = 1;
+        grid[24][11].type = 2;
+        grid[25][0].type = 5;
+        grid[25][11].type = 5;
 
-        for(int y = 0; y < HEIGHT; y++){
+        for(int y = 2; y < HEIGHT; y++){
             for (int x = 0; x < WIDTH; x++){
                 grid[y][x].pos.x = x;
                 grid[y][x].pos.y = y;
@@ -268,6 +278,29 @@ private:
         }
         
     }
+};
+
+class Player{
+    int block_curr;
+    int block_next;
+    
+    //int score;
+    //int highscore
+public:
+    Player(){
+        block_curr = -1;
+    }
+    Shape* create_block()
+    {
+        Shape* block = new Shape(block_curr);
+        
+        block_next = rand() % 7;
+        block->next = block_next;
+        block_curr = block_next;
+        return block;
+    }
+    
+
 };
 
 #endif

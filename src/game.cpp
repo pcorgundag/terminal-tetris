@@ -3,20 +3,12 @@
 
 bool finish(Shape* block, Board &board)
 {
-    for(int y = 3; y >= 0; y--) { 
-        for(int x = 0; x < 4; x++) {
-            if (block->matrice[y][x] == 1) {
-                int boardY = block->pos.y + y;
-                int boardX = block->pos.x + x;
-
-
-                if (board.grid[boardY][boardX].type != 7){
-                    return true; 
-                }
-            }
+    for(int i = 0; i < 10; i++ ){
+        if((board.grid[0][i].type == 7) || (board.grid[0][i].type == 6)){
+            return false;
         }
     }
-        return false;
+        return true;
 }
 void break_row(Board &board, std::vector<int>& completed_lines)
 {   std::vector<int> empty;
@@ -85,17 +77,16 @@ void game_loop()
     Board board;
     bool finish = false;
     int num = -1;
-   while(!finish){
-        Shape* block = new Shape(num);
-        int next = rand() % 7;
-        block->next = next;
+    Player player;
+   while(true){
+        Shape* block = player.create_block();
         std::vector<int> tetris = check_completed_lines(board);
         if(tetris.size() > 0){
             break_row(board, tetris);
         }
-        drop(block, board);
-        num = next;
+        drop(block, board, player);
     }
+    return;
 
 
     

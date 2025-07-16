@@ -2,7 +2,6 @@
 #include <type.h>
 #include <algorithm>
 
-
 void clear_shape(Shape* block, Board &board)
 {
     for(int y = 0; y < 4; y++) {
@@ -11,12 +10,11 @@ void clear_shape(Shape* block, Board &board)
                 int boardY = block->pos.y + y;
                 int boardX = block->pos.x + x;
 
-                if (boardY >= 1 && boardY < HEIGHT && 
+                if (boardY >= 4 && boardY < HEIGHT && 
                     boardX >= 0 && boardX < WIDTH) {
                     board.grid[boardY][boardX].type = 0;
                     board.grid[boardY][boardX].color = Color::White;
                 }
-            
             }
         }
     }
@@ -30,8 +28,8 @@ void draw_shape(Shape* block, Board &board)
                 int boardY = block->pos.y + y;
                 int boardX = block->pos.x + x;
 
-                if (boardY >= 0 && boardY < HEIGHT && 
-                    boardX >= 0 && boardX < WIDTH &&
+                if (boardY >= 4 && boardY < HEIGHT && 
+                    boardX >= 0 && boardX < WIDTH && 
                     board.grid[boardY][boardX].type == 0) {
                     board.grid[boardY][boardX].type = 6;
                     board.grid[boardY][boardX].color = block->color;
@@ -40,7 +38,6 @@ void draw_shape(Shape* block, Board &board)
         }
     }
 }
-
 
 void move_down(Shape* block, Board &board) 
 {
@@ -55,6 +52,7 @@ void move_left(Shape* block, Board &board)
     block->pos.x--;
     draw_shape(block, board);
 }
+
 void move_right(Shape* block, Board &board)
 {
     clear_shape(block, board);
@@ -62,42 +60,32 @@ void move_right(Shape* block, Board &board)
     draw_shape(block, board);
 }
 
+bool can_move_sideways(Shape* block, Board &board, int type) {
+    int dx = (type == 0) ? -1 : 1;
+    
+    for(int y = 0; y < 4; y++) { 
+        for(int x = 0; x < 4; x++) {
+            if (block->matrice[y][x] == 1) {
+                int boardY = block->pos.y + y;
+                int boardX = block->pos.x + x + dx;
 
-bool can_move_sideways(Shape* block, Board &board, int type){
-    switch (type){
-        case 0:
-            for(int y = 3; y >= 0; y--) { 
-                for(int x = 0; x < 4; x++) {
-                    if (block->matrice[y][x] == 1) {
-                        int boardY = block->pos.y + y;
-                        int boardX = block->pos.x + x-1;
+                if (boardX < 0 || boardX >= WIDTH) {
+                    return false;
+                }
 
-
-                        if (board.grid[boardY + 1][boardX].type != 0 && board.grid[boardY + 1][boardX].type != 6) {
-                            return false; 
-                        }
+                if (boardY >= 0 && boardY < HEIGHT) {
+                    if (board.grid[boardY][boardX].type != 0 && 
+                        board.grid[boardY][boardX].type != 5 && 
+                        board.grid[boardY][boardX].type != 6) {
+                        return false;
                     }
                 }
-            }     
-            break;      
-        case 1:
-            for(int y = 3; y >= 0; y--) { 
-                for(int x = 0; x < 4; x++) {
-                    if (block->matrice[y][x] == 1) {
-                        int boardY = block->pos.y + y;
-                        int boardX = block->pos.x + x+1;
-
-
-                        if (board.grid[boardY + 1][boardX].type != 0 && board.grid[boardY + 1][boardX].type != 6) {
-                            return false; 
-                        }
-                    }
-                }
-            }     
-            break;       
+            }
+        }
     }
     return true;
 }
+
 void rotate(Shape* block, Board &board) {
     std::vector<std::vector<bool>> original_matrix = block->matrice;
     
@@ -111,13 +99,11 @@ void rotate(Shape* block, Board &board) {
     }
     
     block->matrice = rotated_matrix;
-   
     draw_shape(block, board);
 }
 
 bool can_rotate(Shape* block, Board &board) {
-
-std::vector<std::vector<bool>> rotated_matrix(4, std::vector<bool>(4, false));
+    std::vector<std::vector<bool>> rotated_matrix(4, std::vector<bool>(4, false));
     
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
@@ -160,15 +146,21 @@ bool collision_check(Shape* block, Board &board)
                 int boardY = block->pos.y + y;
                 int boardX = block->pos.x + x;
 
+                if (boardY + 1 >= HEIGHT || boardX < 0 || boardX >= WIDTH) {
+                    return false;
+                }
 
-                if (board.grid[boardY + 1][boardX].type != 0 && board.grid[boardY + 1][boardX].type != 6) {
-                    return false; 
+                if (board.grid[boardY + 1][boardX].type != 0 && 
+                    board.grid[boardY + 1][boardX].type != 5 && 
+                    board.grid[boardY + 1][boardX].type != 6) {
+                    return false;
                 }
             }
         }
     }
     return true;
 }
+
 void freeze(Shape* block, Board &board)
 {
     for(int y = 0; y < 4; y++) {
@@ -177,8 +169,11 @@ void freeze(Shape* block, Board &board)
                 int boardY = block->pos.y + y;
                 int boardX = block->pos.x + x;
 
-                board.grid[boardY][boardX].type = 7;
-            
+                if (boardY >= 0 && boardY < HEIGHT && 
+                    boardX >= 0 && boardX < WIDTH) {
+                    board.grid[boardY][boardX].type = 7;
+                    board.grid[boardY][boardX].color = block->color;
+                }
             }
         }
     }
@@ -200,8 +195,7 @@ void insta(Shape* block, Board &board)
     draw_shape(block, board);
 }
 
-
-void drop(Shape* block, Board &board)
+void drop(Shape* block, Board &board, Player &player)
 {
     int drop_counter = 0;
     int drop_speed = 7;
@@ -231,7 +225,7 @@ void drop(Shape* block, Board &board)
                 case 's':
                 case KEY_DOWN:
                     move_down(block, board);
-                    drop_counter = 0;  // Reset counter on manual drop
+                    drop_counter = 0;
                     break;
                 case ' ':
                     insta(block, board);
@@ -243,7 +237,6 @@ void drop(Shape* block, Board &board)
             }
         }
         
-        // Auto-drop based on counter
         drop_counter++;
         if (drop_counter >= drop_speed) {
             move_down(block, board);
@@ -253,7 +246,7 @@ void drop(Shape* block, Board &board)
         clear();
         board.printBoard();
         block->print_block_cell();
-        usleep(20000);  // Much faster frame rate (20ms)
+        usleep(20000);
     }
     freeze(block, board);
     delete block;
