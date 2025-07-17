@@ -1,6 +1,8 @@
 #include "mechanics.h"
 #include "type.h"
 
+
+
 bool finish(Board &board)
 {
     for(int y = 0; y < 4; y++){
@@ -17,17 +19,11 @@ void break_row(Board &board, std::vector<int>& completed_lines)
     std::sort(completed_lines.begin(), completed_lines.end(), std::greater<int>());
     for (int line : completed_lines) {
         // Move all rows above the cleared line down by one
-        for (int y = line; y > 1; y--) {
-            for (int x = 1; x < 11; x++) {  // Only copy playable area
+        for (int y = line; y > 4; y--) {
+            for (int x = 1; x < 11; x++) { 
                 board.grid[y][x].type = board.grid[y-1][x].type;
                 board.grid[y][x].color = board.grid[y-1][x].color;
             }
-        }
-        
-        // Clear the top row
-        for (int x = 1; x < 11; x++) {
-            board.grid[1][x].type = 0;
-            board.grid[1][x].color = Color::White;
         }
     }
     completed_lines = empty;
@@ -36,13 +32,11 @@ void break_row(Board &board, std::vector<int>& completed_lines)
 std::vector<int> check_completed_lines(Board &board) {
     std::vector<int> completed_lines;
     
-    // Check rows 1 to 20 (playable area, excluding walls)
-    for (int y = 1; y <= 20; y++) {
+    for (int y = 4; y <= 24; y++) {
         int filled_blocks = 0;
         
-        // Check columns 1 to 10 (excluding walls at 0 and 11)
         for (int x = 1; x < 11; x++) {
-            if (board.grid[y][x].type == 7) {  // Frozen block
+            if (board.grid[y][x].type == 7) {  
                 filled_blocks++;
             }
         }
@@ -53,6 +47,10 @@ std::vector<int> check_completed_lines(Board &board) {
     }
     
     return completed_lines;
+}
+
+void check_lines(){
+    
 }
 
 void game_loop()
@@ -79,13 +77,28 @@ void game_loop()
     Board board;
     int num = -1;
     Player player;
+    int inc_score = 0;
+    int inc_lines = 0;
    while(!finish(board)){
         Shape* block = player.create_block();
-        std::vector<int> tetris = check_completed_lines(board);
-        if(tetris.size() > 0){
-            break_row(board, tetris);
-        }
         drop(block, board, player);
+
+        std::vector<int> tetris = check_completed_lines(board);
+        while (!tetris.empty()) {
+            inc_score += tetris.size();
+            inc_lines += tetris.size();
+            break_row(board, tetris);
+            tetris = check_completed_lines(board);
+        }
+
+        player.score += inc_score;
+        player.lines += inc_lines; 
+        if(inc_lines > 10){
+            player.level++;
+            inc_lines %= 10;
+        }
+        inc_score = 0;
+        
     }
     return;
 

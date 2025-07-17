@@ -246,6 +246,7 @@ void drop(Shape* block, Board &board, Player &player)
         clear();
         board.printBoard();
         block->print_block_cell();
+        player.print_player_stats();
         usleep(20000);
     }
     freeze(block, board);

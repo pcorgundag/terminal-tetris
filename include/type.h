@@ -48,9 +48,9 @@ public:
                 color = Color::Yellow;
                 matrice = {
                 {0, 0, 0, 0},
+                {0, 1, 1, 0},
+                {0, 1, 1, 0},
                 {0, 0, 0, 0},
-                {0, 1, 1, 0},
-                {0, 1, 1, 0},
                 };
                 break;
             case 3:
@@ -117,7 +117,7 @@ public:
     {
     attron(COLOR_PAIR(8));
     int startY = 5;
-    int startX = 90;
+    int startX = 82;
     
     // Draw the box
     mvprintw(startY, startX, "NEXT          ");
@@ -242,15 +242,16 @@ private:
         for(int i = 0; i < 12; i++){
             grid[0][i].type = 5;
         }
-        for(int i = 0; i < 12; i++){
+         for(int i = 0; i < 12; i++){
             grid[1][i].type = 5;
         }
-        for(int i = 0; i < 12; i++){
+         for(int i = 0; i < 12; i++){
             grid[2][i].type = 5;
         }
-        for(int i = 0; i < 12; i++){
+         for(int i = 0; i < 12; i++){
             grid[3][i].type = 5;
         }
+        
 
         //vertical walls
         for(int i = 4; i < 24; i++){
@@ -283,12 +284,18 @@ private:
 class Player{
     int block_curr;
     int block_next;
-    
-    //int score;
-    //int highscore
+
 public:
+    int score;
+    int lines;
+    int level;
+    int highscore;
+    
     Player(){
         block_curr = -1;
+        score = 0;
+        lines = 0;
+        highscore = 0;
     }
     Shape* create_block()
     {
@@ -298,6 +305,27 @@ public:
         block->next = block_next;
         block_curr = block_next;
         return block;
+    }
+    void print_score(){
+        attron(COLOR_PAIR(8));
+        int startY = 11;
+        int startX = 82;
+    
+        mvprintw(startY, startX, "SCORE: %d", score);
+        refresh();
+    }
+    void print_high_score(){
+        attron(COLOR_PAIR(8));
+        int startY = 12;
+        int startX = 82;
+    
+        mvprintw(startY, startX, "HIGHSCORE: %d", highscore);
+        refresh();
+
+    }
+    void print_player_stats(){
+        print_score();
+        print_high_score();
     }
     
 
