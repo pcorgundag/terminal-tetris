@@ -1,11 +1,9 @@
-#include <unistd.h>
-#include <type.h>
-#include <algorithm>
+#include "mechanics.h"
 
 void clear_shape(Shape* block, Board &board)
 {
-    for(int y = 0; y < 4; y++) {
-        for(int x = 0; x < 4; x++) {
+    for(int y = 0; y < block->size; y++) {
+        for(int x = 0; x < block->size; x++) {
             if (block->matrice[y][x] == 1) {
                 int boardY = block->pos.y + y;
                 int boardX = block->pos.x + x;
@@ -22,8 +20,8 @@ void clear_shape(Shape* block, Board &board)
 
 void draw_shape(Shape* block, Board &board) 
 {
-    for(int y = 0; y < 4; y++) {
-        for(int x = 0; x < 4; x++) {
+    for(int y = 0; y < block->size; y++) {
+        for(int x = 0; x < block->size; x++) {
             if (block->matrice[y][x] == 1) {
                 int boardY = block->pos.y + y;
                 int boardX = block->pos.x + x;
@@ -63,8 +61,8 @@ void move_right(Shape* block, Board &board)
 bool can_move_sideways(Shape* block, Board &board, int type) {
     int dx = (type == 0) ? -1 : 1;
     
-    for(int y = 0; y < 4; y++) { 
-        for(int x = 0; x < 4; x++) {
+    for(int y = 0; y < block->size; y++) { 
+        for(int x = 0; x < block->size; x++) {
             if (block->matrice[y][x] == 1) {
                 int boardY = block->pos.y + y;
                 int boardX = block->pos.x + x + dx;
@@ -90,11 +88,11 @@ void rotate(Shape* block, Board &board) {
     std::vector<std::vector<bool>> original_matrix = block->matrice;
     
     clear_shape(block, board);
-    std::vector<std::vector<bool>> rotated_matrix(4, std::vector<bool>(4, false));
+    std::vector<std::vector<bool>> rotated_matrix(block->size, std::vector<bool>(block->size, false));
     
-    for (int i = 0; i < 4; i++) {
-        for (int j = 0; j < 4; j++) {
-            rotated_matrix[j][3-i] = block->matrice[i][j];
+    for (int i = 0; i < block->size; i++) {
+        for (int j = 0; j < block->size; j++) {
+            rotated_matrix[j][block->size - 1 - i] = block->matrice[i][j];
         }
     }
     
@@ -105,14 +103,14 @@ void rotate(Shape* block, Board &board) {
 bool can_rotate(Shape* block, Board &board) {
     std::vector<std::vector<bool>> rotated_matrix(4, std::vector<bool>(4, false));
     
-    for (int i = 0; i < 4; i++) {
-        for (int j = 0; j < 4; j++) {
-            rotated_matrix[j][3-i] = block->matrice[i][j];
+    for (int i = 0; i < block->size; i++) {
+        for (int j = 0; j < block->size; j++) {
+            rotated_matrix[j][block->size - 1 - i] = block->matrice[i][j];
         }
     }
 
-    for (int y = 0; y < 4; y++) {
-        for (int x = 0; x < 4; x++) {
+    for (int y = 0; y < block->size; y++) {
+        for (int x = 0; x < block->size; x++) {
             if (rotated_matrix[y][x] == 1) {
                 int boardY = block->pos.y + y;
                 int boardX = block->pos.x + x;
@@ -140,8 +138,8 @@ bool can_rotate(Shape* block, Board &board) {
 
 bool collision_check(Shape* block, Board &board)
 {    
-    for(int y = 3; y >= 0; y--) { 
-        for(int x = 0; x < 4; x++) {
+    for(int y = block->size - 1; y >= 0; y--) { 
+        for(int x = 0; x < block->size; x++) {
             if (block->matrice[y][x] == 1) {
                 int boardY = block->pos.y + y;
                 int boardX = block->pos.x + x;
@@ -163,8 +161,8 @@ bool collision_check(Shape* block, Board &board)
 
 void freeze(Shape* block, Board &board)
 {
-    for(int y = 0; y < 4; y++) {
-        for(int x = 0; x < 4; x++) {
+    for(int y = 0; y < block->size; y++) {
+        for(int x = 0; x < block->size; x++) {
             if (block->matrice[y][x] == 1) {
                 int boardY = block->pos.y + y;
                 int boardX = block->pos.x + x;

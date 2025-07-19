@@ -1,9 +1,6 @@
-#include "mechanics.h"
-#include "type.h"
+#include "game.h"
 
-
-
-bool finish(Board &board)
+bool Game::finish(Board &board)
 {
     for(int y = 0; y < 4; y++){
         for(int x = 1; x < 11; x++){
@@ -14,7 +11,7 @@ bool finish(Board &board)
     }
         return false;
 }
-void break_row(Board &board, std::vector<int>& completed_lines)
+void Game::break_row(Board &board, std::vector<int>& completed_lines)
 {   std::vector<int> empty;
     std::sort(completed_lines.begin(), completed_lines.end(), std::greater<int>());
     for (int line : completed_lines) {
@@ -29,7 +26,7 @@ void break_row(Board &board, std::vector<int>& completed_lines)
     completed_lines = empty;
 }
 
-std::vector<int> check_completed_lines(Board &board) {
+std::vector<int> Game::check_completed_lines(Board &board) {
     std::vector<int> completed_lines;
     
     for (int y = 4; y <= 24; y++) {
@@ -49,13 +46,7 @@ std::vector<int> check_completed_lines(Board &board) {
     return completed_lines;
 }
 
-void check_lines(){
-    
-}
-
-void game_loop()
-{
-
+void Game::init_ncurses(){
     if (has_colors()) {
         start_color();
         init_pair(1, COLOR_YELLOW, COLOR_BLACK);
@@ -73,12 +64,12 @@ void game_loop()
     cbreak();
     nodelay(stdscr, TRUE);  // Non-blocking input
     keypad(stdscr, TRUE);
+}
 
-    Board board;
-    int num = -1;
-    Player player;
-    int inc_score = 0;
-    int inc_lines = 0;
+void Game::game_loop()
+{
+    init_ncurses();
+
    while(!finish(board)){
         Shape* block = player.create_block();
         drop(block, board, player);
@@ -92,11 +83,14 @@ void game_loop()
         }
 
         player.score += inc_score;
-        player.lines += inc_lines; 
-        if(inc_lines > 10){
+        player.lines += inc_lines;
+        tens = inc_lines;
+        if(tens == 10){
             player.level++;
-            inc_lines %= 10;
-        }
+            tens = 0;
+        } 
+       
+        inc_lines = 0;
         inc_score = 0;
         
     }

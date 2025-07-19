@@ -10,7 +10,9 @@ int main() {
     srand(time(0) ^ getpid());
     rand();
 
-    game_loop();
+    Game game;
+    game.game_loop();
+
     endwin();
     system("reset");
 
