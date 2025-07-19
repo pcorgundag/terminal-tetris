@@ -11,18 +11,39 @@ bool Game::finish(Board &board)
     }
         return false;
 }
-void Game::break_row(Board &board, std::vector<int>& completed_lines)
-{   std::vector<int> empty;
+void Game::break_row(Board &board, std::vector<int>& completed_lines) {
+    std::vector<int> empty;
     std::sort(completed_lines.begin(), completed_lines.end(), std::greater<int>());
-    for (int line : completed_lines) {
-        // Move all rows above the cleared line down by one
-        for (int y = line; y > 4; y--) {
-            for (int x = 1; x < 11; x++) { 
-                board.grid[y][x].type = board.grid[y-1][x].type;
-                board.grid[y][x].color = board.grid[y-1][x].color;
+    
+    int lines_cleared = 0;
+    int current_line_index = 0;
+    
+    // Process from bottom to top
+    for (int y = 26; y >= 4; y--) {  // Assuming 24 is your bottom row
+        // Check if current row should be cleared
+        if (current_line_index < completed_lines.size() && 
+            y == completed_lines[current_line_index]) {
+            lines_cleared++;
+            current_line_index++;
+            continue;  // Skip this row (it gets cleared)
+        }
+        
+        // Move this row down by the number of lines cleared below it
+        if (lines_cleared > 0) {
+            for (int x = 1; x < 11; x++) {
+                board.grid[y + lines_cleared][x].type = board.grid[y][x].type;
+                board.grid[y + lines_cleared][x].color = board.grid[y][x].color;
             }
         }
     }
+    
+    // Clear the top rows
+    for (int y = 4; y < 4 + lines_cleared; y++) {
+        for (int x = 1; x < 11; x++) {
+            board.grid[y][x].type = 0;  // Assuming 0 is empty
+        }
+    }
+    
     completed_lines = empty;
 }
 
@@ -46,16 +67,24 @@ std::vector<int> Game::check_completed_lines(Board &board) {
     return completed_lines;
 }
 
+void Game::render(Board& board, Player& player, Shape* block){
+    clear();
+    board.printBoard();
+    block->print_block_cell();
+    player.print_player_stats();
+    usleep(20000);
+}
+
 void Game::init_ncurses(){
     if (has_colors()) {
         start_color();
-        init_pair(1, COLOR_YELLOW, COLOR_BLACK);
-        init_pair(2, 208, COLOR_BLACK); //orange
-        init_pair(3, COLOR_BLUE, COLOR_BLACK);
-        init_pair(4, 44, COLOR_BLACK); //teal
-        init_pair(5, 93, COLOR_BLACK); //purple
-        init_pair(6, COLOR_GREEN, COLOR_BLACK);
-        init_pair(7, COLOR_RED, COLOR_BLACK);
+        init_pair(1, 227, COLOR_BLACK); //yellow
+        init_pair(2, 215, COLOR_BLACK); //orange
+        init_pair(3, 25, COLOR_BLACK); //dark blue
+        init_pair(4, 159, COLOR_BLACK); //teal
+        init_pair(5, 213, COLOR_BLACK); //purple
+        init_pair(6, 114, COLOR_BLACK); //green
+        init_pair(7, 168, COLOR_BLACK); //red
         init_pair(8, COLOR_WHITE, COLOR_BLACK);
         
     }

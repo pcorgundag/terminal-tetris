@@ -240,7 +240,6 @@ void drop(Shape* block, Board &board, Player &player)
             move_down(block, board);
             drop_counter = 0;
         }
-        
         clear();
         board.printBoard();
         block->print_block_cell();

@@ -19,6 +19,7 @@ private:
     void break_row(Board &board, std::vector<int>& completed_lines);
     std::vector<int> check_completed_lines(Board &board);
     void init_ncurses();
+    void render(Board& board, Player& player, Shape* block);
 
 public:
     void game_loop();
